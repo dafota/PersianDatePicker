@@ -1,4 +1,2 @@
-
 rootProject.name = "PersianDatePicker"
-include ':app'
-include ':library'
+include ':app' , ':library'
