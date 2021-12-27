@@ -26,18 +26,17 @@ class PersianDatePicker : FrameLayout {
         defStyleAttr
     )
 
-    private val persianDate = PersianDate()
-    private val todayName = persianDate.dayName()
-    private val today = persianDate.shDay
-    private val currentMonth = persianDate.shMonth
-    private val currentMonthName = persianDate.monthName()
-    private val currentYear = persianDate.shYear
+    private var persianDate = PersianDate()
+    private var todayName = persianDate.dayName()
+    private var today = persianDate.shDay
+    private var currentMonth = persianDate.shMonth
+    private var currentMonthName = persianDate.monthName()
+    private var currentYear = persianDate.shYear
 
-    private val todayDetail =
+    private var todayDetail =
         DayDetail(todayName, today, currentMonthName, currentMonth, currentYear)
 
-    var selectedDate = todayDetail
-        private set
+    private var selectedDateDetail = todayDetail
 
 
     private val content: ConstraintLayout =
@@ -52,6 +51,20 @@ class PersianDatePicker : FrameLayout {
         notifyListener()
     }
 
+    fun init(timeInMilliSecond: Long) {
+        persianDate = PersianDate(timeInMilliSecond)
+        todayName = persianDate.dayName()
+        today = persianDate.shDay
+        currentMonth = persianDate.shMonth
+        currentMonthName = persianDate.monthName()
+        currentYear = persianDate.shYear
+        todayDetail = DayDetail(todayName, today, currentMonthName, currentMonth, currentYear)
+        selectedDateDetail = todayDetail
+
+        renderUI()
+        notifyListener()
+    }
+
     fun setListener(listener: Listener) {
         this.listener = listener
         notifyListener()
@@ -59,6 +72,10 @@ class PersianDatePicker : FrameLayout {
 
     fun nextMonth() {
         internalNextMonth()
+    }
+
+    fun toDate() {
+        TODO()
     }
 
     private fun internalNextMonth() {
@@ -152,7 +169,7 @@ class PersianDatePicker : FrameLayout {
 
             persianDate.shDay = day.number
 
-            selectedDate = selectedDate.copy(
+            selectedDateDetail = selectedDateDetail.copy(
                 dayName = day.name.name,
                 dayNumber = day.number,
                 monthName = persianDate.monthName(),
@@ -198,9 +215,9 @@ class PersianDatePicker : FrameLayout {
     }
 
     private fun isSelected(dayNum: Int): Boolean {
-        return dayNum == selectedDate.dayNumber &&
-                selectedDate.monthNumber == persianDate.shMonth &&
-                selectedDate.yearNumber == persianDate.shYear
+        return dayNum == selectedDateDetail.dayNumber &&
+                selectedDateDetail.monthNumber == persianDate.shMonth &&
+                selectedDateDetail.yearNumber == persianDate.shYear
     }
 
 }

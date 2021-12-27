@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        binding.persianDatePicker.init(System.currentTimeMillis())
     }
 
 
