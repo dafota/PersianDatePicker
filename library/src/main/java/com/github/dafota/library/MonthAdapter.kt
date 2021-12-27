@@ -34,6 +34,8 @@ class MonthAdapter(
 
     class DayHolder(private val binding: ItemDayBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(day: Day, onDaySelected: (Day) -> Unit) {
+            binding.text.isSelected = day.isSelected
+
             val context = binding.root.context
 
             val shape = MaterialShapeDrawable(

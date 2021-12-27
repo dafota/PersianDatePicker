@@ -12,6 +12,7 @@
         android:layout_height="@dimen/mtrl_calendar_day_height"
         android:gravity="center"
         android:textAppearance="?textAppearanceCaption"
+        android:textColor="@color/day_text_color"
         tools:maxLength="2"
         tools:text="@tools:sample/us_zipcodes" />
 

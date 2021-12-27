@@ -12,6 +12,29 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater).also { setContentView(it.root) }
+
+        with(binding) {
+            ivNextMonth.setOnClickListener { persianDatePicker.nextMonth() }
+            ivPreviousMonth.setOnClickListener { persianDatePicker.previousMonth() }
+
+            persianDatePicker.setListener {
+                tvSelectedYear.text = it.selectedDay.yearNumber.toString()
+                tvSelectedDay.text = StringBuilder()
+                    .append(it.selectedDay.dayName)
+                    .append(", ")
+                    .append(it.selectedDay.dayNumber)
+                    .append(" ")
+                    .append(it.selectedDay.monthName)
+                    .toString()
+
+                tvCalendarTitle.text = StringBuilder()
+                    .append(it.selectedDay.monthName)
+                    .append(" ")
+                    .append(it.selectedDay.yearNumber)
+                    .toString()
+            }
+        }
+
     }
 
 

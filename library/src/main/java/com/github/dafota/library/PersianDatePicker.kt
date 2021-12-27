@@ -3,17 +3,18 @@ package com.github.dafota.library
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.dafota.library.model.Day
+import com.github.dafota.library.model.DayDetail
 import com.github.dafota.library.model.EnumDay
+import com.github.dafota.library.model.PersianDateDetail
 import com.github.dafota.library.utils.asEnum
 import com.github.dafota.library.utils.inc
 import com.github.dafota.library.utils.inflater
 import saman.zamani.persiandate.PersianDate
+
 
 class PersianDatePicker : FrameLayout {
 
@@ -26,56 +27,73 @@ class PersianDatePicker : FrameLayout {
     )
 
     private val persianDate = PersianDate()
+    private val todayName = persianDate.dayName()
+    private val today = persianDate.shDay
+    private val currentMonth = persianDate.shMonth
+    private val currentMonthName = persianDate.monthName()
+    private val currentYear = persianDate.shYear
+
+    private val todayDetail =
+        DayDetail(todayName, today, currentMonthName, currentMonth, currentYear)
+
+    var selectedDate = todayDetail
+        private set
+
+
     private val content: ConstraintLayout =
         inflater.inflate(R.layout.base_layout, this, false) as ConstraintLayout
-    private val tvMonth: TextView = content.findViewById(R.id.tv_month) as TextView
-    private val tvSelectedDate: TextView = content.findViewById(R.id.tv_selected_date)
     private val rvMonth: RecyclerView = content.findViewById(R.id.rv_month)
-    private val rvDaysOfWeeek: RecyclerView = content.findViewById(R.id.rv_days)
+    private val rvDaysOfWeek: RecyclerView = content.findViewById(R.id.rv_days)
+    private var listener: Listener? = null
 
     init {
         addView(content)
-
-        val ivNextMonth = content.findViewById<ImageView>(R.id.iv_next_month)
-        val ivPreMonth = content.findViewById<ImageView>(R.id.iv_previous_month)
-
-        tvMonth.text = "${persianDate.monthName()} ${persianDate.shYear}"
-        tvSelectedDate.text =
-            "${persianDate.dayName()} ${persianDate.shDay} ${persianDate.monthName()} ${persianDate.shYear}"
-
-        ivNextMonth.setOnClickListener { nextMonth() }
-        ivPreMonth.setOnClickListener { preMonth() }
-
         renderUI()
+        notifyListener()
     }
 
+    fun setListener(listener: Listener) {
+        this.listener = listener
+        notifyListener()
+    }
 
-    private fun nextMonth() {
+    fun nextMonth() {
+        internalNextMonth()
+    }
+
+    private fun internalNextMonth() {
         if (persianDate.shMonth == 12) {
             persianDate.shYear = persianDate.shYear.plus(1)
             persianDate.shMonth = 1
+            notifyListener()
         } else {
             persianDate.shMonth = persianDate.shMonth.plus(1)
         }
 
+        notifyListener()
         renderUI()
     }
 
-    private fun preMonth() {
-        if (persianDate.shMonth == 1) {
-            persianDate.shYear = persianDate.shYear.minus(1)
-            persianDate.shMonth = 12
+    fun previousMonth() {
+        internalPreviousMonth()
+    }
+
+    private fun internalPreviousMonth() = with(persianDate) {
+        if (shMonth == 1) {
+            shYear = shYear.minus(1)
+            shMonth = 12
+
+            notifyListener()
         } else {
-            persianDate.shMonth = persianDate.shMonth.minus(1)
+            shMonth = shMonth.minus(1)
         }
 
+        notifyListener()
         renderUI()
     }
 
     private fun renderUI() {
-        tvMonth.text = "${persianDate.monthName()} ${persianDate.shYear}"
 
-        val currentDay = persianDate.shDay
         // set calendar to first day of month
         persianDate.shDay = 1
 
@@ -103,7 +121,8 @@ class PersianDatePicker : FrameLayout {
                 Day(
                     name = indexDay,
                     number = it.plus(1),
-                    isCurrentDay = it.plus(1) == currentDay
+                    isCurrentDay = isToday(it.plus(1)),
+                    isSelected = isSelected(it.plus(1))
                 )
             )
 
@@ -126,14 +145,24 @@ class PersianDatePicker : FrameLayout {
         val layoutManager = GridLayoutManager(context, 7, GridLayoutManager.VERTICAL, false)
 
         var adapter: MonthAdapter? = null
-        adapter = MonthAdapter(days) {
+        adapter = MonthAdapter(days) { day ->
             days.firstOrNull { it.isSelected }?.let {
                 it.isSelected = false
             }
 
-            onDaySelected(it)
+            persianDate.shDay = day.number
 
-            it.isSelected = true
+            selectedDate = selectedDate.copy(
+                dayName = day.name.name,
+                dayNumber = day.number,
+                monthName = persianDate.monthName(),
+                monthNumber = persianDate.shMonth,
+                yearNumber = persianDate.shYear
+            )
+
+            day.isSelected = true
+            notifyListener()
+
             adapter?.notifyDataSetChanged()
         }
 
@@ -141,20 +170,37 @@ class PersianDatePicker : FrameLayout {
         rvMonth.layoutManager = layoutManager
         rvMonth.adapter = adapter
 
-        rvDaysOfWeeek.layoutManager = GridLayoutManager(
+        rvDaysOfWeek.layoutManager = GridLayoutManager(
             context,
             7,
             GridLayoutManager.VERTICAL,
             false
         )
 
-        rvDaysOfWeeek.adapter = DayAdapter(com.github.dafota.library.utils.weekDays)
+        rvDaysOfWeek.adapter = DayAdapter(com.github.dafota.library.utils.weekDays)
     }
 
-    private fun onDaySelected(it: Day) {
-        persianDate.shDay = it.number
-        tvSelectedDate.text =
-            "${persianDate.dayName()} ${persianDate.shDay} ${persianDate.monthName()} ${persianDate.shYear}"
+    private fun notifyListener() {
+        with(persianDate) {
+            val detail = PersianDateDetail(
+                selectedDay = DayDetail(dayName(), shDay, monthName(), shMonth, shYear),
+                today = todayDetail
+            )
+
+            listener?.onChange(detail)
+        }
+    }
+
+    private fun isToday(dayNum: Int): Boolean {
+        return dayNum == today &&
+                currentMonth == persianDate.shMonth &&
+                currentYear == persianDate.shYear
+    }
+
+    private fun isSelected(dayNum: Int): Boolean {
+        return dayNum == selectedDate.dayNumber &&
+                selectedDate.monthNumber == persianDate.shMonth &&
+                selectedDate.yearNumber == persianDate.shYear
     }
 
 }
