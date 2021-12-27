@@ -1,5 +1,7 @@
 # PersianDatePicker
 
+![Art]("https://github.com/dafota/PersianDatePicker/blob/master/Screenshot_20211227_163737.png?raw=true") 
+
 A Material Data picker based on android MaterialDatePicker for persian calendar.
 
 **Step 1.** Add the JitPack repository to your build file 			
