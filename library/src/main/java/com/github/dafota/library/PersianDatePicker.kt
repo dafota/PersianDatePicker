@@ -14,6 +14,7 @@ import com.github.dafota.library.utils.asEnum
 import com.github.dafota.library.utils.inc
 import com.github.dafota.library.utils.inflater
 import saman.zamani.persiandate.PersianDate
+import java.util.*
 
 
 class PersianDatePicker : FrameLayout {
@@ -74,8 +75,8 @@ class PersianDatePicker : FrameLayout {
         internalNextMonth()
     }
 
-    fun toDate() {
-        TODO()
+    fun toDate(): Date {
+        return persianDate.toDate()
     }
 
     private fun internalNextMonth() {
