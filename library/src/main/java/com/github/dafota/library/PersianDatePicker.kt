@@ -48,8 +48,8 @@ class PersianDatePicker : FrameLayout {
 
     init {
         addView(content)
-        renderUI()
         notifyListener()
+        renderUI()
     }
 
     fun init(timeInMilliSecond: Long) {
@@ -62,8 +62,8 @@ class PersianDatePicker : FrameLayout {
         todayDetail = DayDetail(todayName, today, currentMonthName, currentMonth, currentYear)
         selectedDateDetail = todayDetail
 
-        renderUI()
         notifyListener()
+        renderUI()
     }
 
     fun setListener(listener: Listener) {
