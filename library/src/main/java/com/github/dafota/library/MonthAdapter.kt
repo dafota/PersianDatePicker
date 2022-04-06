@@ -18,7 +18,7 @@ import com.google.android.material.shape.ShapeAppearanceModel
 
 class MonthAdapter(
     private val items: List<Day>,
-    private val onDaySelected: (Day) -> Unit
+    private val onDaySelected: (Day, Int) -> Unit
 ) : RecyclerView.Adapter<MonthAdapter.DayHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DayHolder {
@@ -33,7 +33,7 @@ class MonthAdapter(
     override fun getItemCount() = items.size
 
     class DayHolder(private val binding: ItemDayBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(day: Day, onDaySelected: (Day) -> Unit) {
+        fun bind(day: Day, onDaySelected: (Day, Int) -> Unit) {
             binding.text.isSelected = day.isSelected
 
             val context = binding.root.context
@@ -59,7 +59,7 @@ class MonthAdapter(
 
                 ViewCompat.setBackground(binding.text, InsetDrawable(d, 0))
 
-                if (day.isCurrentDay) {
+                if (day.isToday) {
                     val d = RippleDrawable(
                         binding.text.textColors.withAlpha(30),
                         ContextCompat.getDrawable(context, R.drawable.shape_circle),
@@ -68,7 +68,7 @@ class MonthAdapter(
                     ViewCompat.setBackground(binding.text, InsetDrawable(d, 0))
                 }
             } else {
-                if (day.isCurrentDay) {
+                if (day.isToday) {
                     val d = RippleDrawable(
                         binding.text.textColors.withAlpha(30),
                         ContextCompat.getDrawable(context, R.drawable.shape_stroke),
@@ -99,7 +99,7 @@ class MonthAdapter(
             }
 
             binding.text.setOnClickListener {
-                onDaySelected(day)
+                onDaySelected(day, adapterPosition)
             }
         }
     }
