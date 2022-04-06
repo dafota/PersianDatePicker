@@ -2,10 +2,6 @@
 <resources>
 
     <declare-styleable name="PersianDatePicker">
-        <attr name="selectedYear" format="reference" />
-        <attr name="selectedMonth" format="integer" />
-        <attr name="selectedDay" format="integer" />
-        <attr name="displayMonthNames" format="boolean" />
     </declare-styleable>
 
 </resources>

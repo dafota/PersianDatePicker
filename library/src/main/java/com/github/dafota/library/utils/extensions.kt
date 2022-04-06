@@ -9,7 +9,7 @@ import com.github.dafota.library.model.EnumDay
 
 val Int.dp get() = (this * Resources.getSystem().displayMetrics.density)
 
-val ViewGroup.inflater get() = LayoutInflater.from(context)
+val ViewGroup.inflater: LayoutInflater get() = LayoutInflater.from(context)
 
 val weekDays = arrayListOf<DayOfWeek>().apply {
     add(DayOfWeek(EnumDay.Saturday, false))
